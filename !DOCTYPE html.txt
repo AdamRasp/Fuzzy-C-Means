@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dasbor Interaktif: Fuzzy C-Means (FCM)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Chosen Palette: Calm Harmony (Light Slate/Gray, Muted Teal Accent) -->
+    <!-- Application Structure Plan: A four-section single-page application (Pengantar, Simulasi Interaktif, Algoritma & Rumus, Aplikasi) navigated by tabs. This structure separates the high-level concept, the hands-on interactive learning, the formal reference, and real-world context, creating a more engaging and logical user flow than a simple linear document. The interactive simulation is the centerpiece, designed to make the abstract algorithm intuitive. -->
+    <!-- Visualization & Content Choices: Pengantar: Goal=Inform, Method=Text with Icons, Interaction=None. Simulasi: Goal=Explain Process, Method=Chart.js Scatter Plot + Controls, Interaction=User-driven step-by-step execution. Algoritma: Goal=Reference, Method=Formatted Text Cards, Interaction=None. Aplikasi: Goal=Show Relevance, Method=Icon+Text Cards in a Grid, Interaction=Hover. This combination provides multiple ways to understand FCM, catering to different learning styles. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc; /* slate-50 */
+        }
+        .nav-button {
+            transition: all 0.3s ease;
+            border-bottom: 2px solid transparent;
+        }
+        .nav-button.active {
+            color: #0f766e; /* teal-700 */
+            border-bottom-color: #0f766e; /* teal-700 */
+        }
+        .content-section {
+            display: none;
+        }
+        .content-section.active {
+            display: block;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 400px;
+            max-height: 60vh;
+        }
+        .formula-card {
+            background-color: #f1f5f9; /* slate-100 */
+            border-left: 4px solid #14b8a6; /* teal-500 */
+            padding: 1rem;
+            border-radius: 0.5rem;
+            font-family: monospace;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body class="text-slate-800">
+
+    <div class="container mx-auto max-w-6xl p-4 sm:p-6 lg:p-8">
+        
+        <header class="text-center mb-8">
+            <h1 class="text-4xl font-bold text-teal-800">Fuzzy C-Means (FCM) Clustering</h1>
+            <p class="mt-2 text-lg text-slate-600">Sebuah Penjelasan Interaktif dari Konsep hingga Aplikasi</p>
+        </header>
+
+        <nav class="flex justify-center border-b border-slate-200 mb-8">
+            <button class="nav-button active py-4 px-6 text-slate-600 font-semibold" data-target="pengantar">Pengantar</button>
+            <button class="nav-button py-4 px-6 text-slate-600 font-semibold" data-target="simulasi">Simulasi Interaktif</button>
+            <button class="nav-button py-4 px-6 text-slate-600 font-semibold" data-target="algoritma">Algoritma & Rumus</button>
+            <button class="nav-button py-4 px-6 text-slate-600 font-semibold" data-target="aplikasi">Aplikasi</button>
+        </nav>
+
+        <main>
+            <!-- Section 1: Pengantar -->
+            <section id="pengantar" class="content-section active">
+                 <div class="text-center mb-10">
+                    <h2 class="text-3xl font-bold mb-2">Apa itu Fuzzy C-Means?</h2>
+                    <p class="max-w-3xl mx-auto text-slate-600">
+                        Fuzzy C-Means (FCM) adalah algoritma pengelompokan (clustering) di mana setiap titik data dapat menjadi anggota dari beberapa cluster sekaligus, namun dengan derajat keanggotaan yang berbeda. Berbeda dari metode lain yang "memaksa" sebuah data masuk ke satu cluster saja, FCM memberikan fleksibilitas yang lebih realistis untuk data yang ambigu.
+                    </p>
+                </div>
+                
+                <h3 class="text-2xl font-bold text-center mb-6">Tujuan Utama Clustering</h3>
+                <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div class="bg-white p-6 rounded-lg shadow-sm border border-slate-200 text-center">
+                        <div class="text-4xl mb-3">🗂️</div>
+                        <h4 class="font-bold text-lg mb-1">Reduksi Data</h4>
+                        <p class="text-slate-600 text-sm">Menemukan perwakilan untuk grup data yang besar dan homogen.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-sm border border-slate-200 text-center">
+                        <div class="text-4xl mb-3">🧩</div>
+                        <h4 class="font-bold text-lg mb-1">Penemuan Pola</h4>
+                        <p class="text-slate-600 text-sm">Menemukan "klaster alami" untuk mendeskripsikan properti data.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-sm border border-slate-200 text-center">
+                        <div class="text-4xl mb-3">🎯</div>
+                        <h4 class="font-bold text-lg mb-1">Pengelompokan Fungsional</h4>
+                        <p class="text-slate-600 text-sm">Menemukan grup data yang "berguna" sesuai kebutuhan analisis.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-sm border border-slate-200 text-center">
+                        <div class="text-4xl mb-3">🚨</div>
+                        <h4 class="font-bold text-lg mb-1">Deteksi Outlier</h4>
+                        <p class="text-slate-600 text-sm">Mengidentifikasi objek atau titik data yang tidak biasa (anomali).</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 2: Simulasi -->
+            <section id="simulasi" class="content-section">
+                <div class="text-center mb-10">
+                    <h2 class="text-3xl font-bold mb-2">Simulasi Interaktif Algoritma FCM</h2>
+                    <p class="max-w-3xl mx-auto text-slate-600">
+                        Visualisasikan bagaimana algoritma FCM bekerja langkah demi langkah. Gunakan kontrol di bawah untuk memulai dan menjalankan setiap fase dari proses clustering.
+                    </p>
+                </div>
+                <div class="flex flex-col lg:flex-row gap-8">
+                    <div class="flex-grow lg:w-2/3">
+                        <div class="chart-container bg-white rounded-lg shadow-md border border-slate-200">
+                            <canvas id="fcmChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="flex-shrink-0 lg:w-1/3">
+                        <div class="bg-white p-6 rounded-lg shadow-sm border border-slate-200 h-full">
+                            <h3 class="font-bold text-lg mb-4">Kontrol Simulasi</h3>
+                            <div class="space-y-4">
+                                <div>
+                                    <label for="clusterCount" class="block text-sm font-medium text-slate-700">Jumlah Cluster (c):</label>
+                                    <input type="number" id="clusterCount" value="3" min="2" max="10" class="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-teal-500 focus:ring-teal-500 sm:text-sm">
+                                </div>
+                                <div class="grid grid-cols-2 gap-2">
+                                     <button id="resetBtn" class="w-full bg-slate-600 hover:bg-slate-700 text-white font-bold py-2 px-4 rounded-md transition">Reset</button>
+                                     <button id="initBtn" class="w-full bg-teal-600 hover:bg-teal-700 text-white font-bold py-2 px-4 rounded-md transition">1. Inisialisasi</button>
+                                     <button id="centroidBtn" class="w-full bg-teal-600 hover:bg-teal-700 text-white font-bold py-2 px-4 rounded-md transition" disabled>2. Hitung Pusat</button>
+                                     <button id="updateBtn" class="w-full bg-teal-600 hover:bg-teal-700 text-white font-bold py-2 px-4 rounded-md transition" disabled>3. Update Keanggotaan</button>
+                                </div>
+                                <button id="iterateBtn" class="w-full bg-sky-600 hover:bg-sky-700 text-white font-bold py-2 px-4 rounded-md transition" disabled>Jalankan 1 Iterasi (Langkah 2 & 3)</button>
+                            </div>
+                            <div id="explanationBox" class="mt-6 p-4 bg-slate-50 rounded-md border border-slate-200">
+                                <h4 class="font-semibold text-slate-800">Penjelasan Langkah</h4>
+                                <p class="text-sm text-slate-600 mt-1">Klik "Inisialisasi" untuk memulai. 100 titik data acak akan dibuat bersama dengan matriks keanggotaan fuzzy awal.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 3: Algoritma -->
+            <section id="algoritma" class="content-section">
+                <div class="text-center mb-10">
+                    <h2 class="text-3xl font-bold mb-2">Algoritma & Rumus Kunci</h2>
+                    <p class="max-w-3xl mx-auto text-slate-600">
+                        Berikut adalah detail teknis dan rumus matematika yang menjadi dasar dari algoritma Fuzzy C-Means.
+                    </p>
+                </div>
+                <div class="space-y-6">
+                    <div>
+                        <h3 class="text-xl font-semibold mb-2">Langkah 1: Inisialisasi Parameter</h3>
+                        <p class="text-slate-600">Tentukan jumlah cluster (c), pangkat pembobot (w atau m), error minimum (ε), dan iterasi maksimum. Kemudian, bangkitkan matriks partisi/keanggotaan awal (U) secara acak, di mana setiap elemen 𝜇_ik adalah derajat keanggotaan data ke-i pada cluster ke-k.</p>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-semibold mb-2">Langkah 2: Perhitungan Pusat Cluster (V)</h3>
+                        <p class="text-slate-600 mb-3">Pusat cluster baru dihitung sebagai rata-rata tertimbang dari semua titik data. Bobotnya adalah pangkat dari derajat keanggotaan titik data tersebut.</p>
+                        <div class="formula-card">V_kj = [ Σ(i=1 to N) (μ_ik)^w * X_ij ] / [ Σ(i=1 to N) (μ_ik)^w ]</div>
+                    </div>
+                     <div>
+                        <h3 class="text-xl font-semibold mb-2">Langkah 3: Perhitungan Fungsi Objektif (P) - Opsional</h3>
+                        <p class="text-slate-600 mb-3">Fungsi ini mengukur total kuadrat jarak dari setiap data ke pusat clusternya, dibobotkan oleh derajat keanggotaan. Tujuannya adalah meminimalkan nilai ini.</p>
+                        <div class="formula-card">P_t = Σ(i=1 to N) Σ(k=1 to c) (||X_i - V_k||^2) * (μ_ik)^w</div>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-semibold mb-2">Langkah 4: Perubahan Matriks Partisi (U)</h3>
+                        <p class="text-slate-600 mb-3">Derajat keanggotaan setiap data diperbarui. Data yang lebih dekat dengan suatu pusat cluster akan memiliki derajat keanggotaan yang lebih tinggi pada cluster tersebut.</p>
+                        <div class="formula-card">μ_ik = 1 / [ Σ(j=1 to c) ( (d_ik / d_jk)^(2 / (w-1)) ) ]</div>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-semibold mb-2">Langkah 5: Cek Kondisi Berhenti</h3>
+                        <p class="text-slate-600">Ulangi langkah 2 dan 4 hingga perubahan pada matriks partisi (atau fungsi objektif) lebih kecil dari nilai ε yang ditentukan, atau jumlah iterasi telah mencapai batas maksimum.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 4: Aplikasi -->
+            <section id="aplikasi" class="content-section">
+                 <div class="text-center mb-10">
+                    <h2 class="text-3xl font-bold mb-2">Penerapan di Dunia Nyata</h2>
+                    <p class="max-w-3xl mx-auto text-slate-600">
+                       FCM digunakan secara luas di berbagai bidang karena kemampuannya menangani data yang tidak pasti dan tumpang tindih. Berikut beberapa contohnya.
+                    </p>
+                </div>
+                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div class="bg-white p-6 rounded-lg shadow-sm border border-slate-200 transition hover:shadow-md hover:border-teal-500">
+                        <h3 class="font-bold text-lg mb-2">📊 Marketing & Bisnis</h3>
+                        <p class="text-slate-600">Melakukan segmentasi pelanggan berdasarkan perilaku pembelian, demografi, dan preferensi untuk menargetkan kampanye pemasaran secara lebih efektif.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-sm border border-slate-200 transition hover:shadow-md hover:border-teal-500">
+                        <h3 class="font-bold text-lg mb-2">🖼️ Segmentasi Gambar</h3>
+                        <p class="text-slate-600">Memisahkan bagian-bagian berbeda dari sebuah gambar, misalnya dalam citra medis untuk mengidentifikasi jaringan tumor dari jaringan sehat pada hasil MRI.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-sm border border-slate-200 transition hover:shadow-md hover:border-teal-500">
+                        <h3 class="font-bold text-lg mb-2">🧬 Biologi & Bioinformatika</h3>
+                        <p class="text-slate-600">Mengelompokkan gen berdasarkan pola ekspresi mereka untuk memahami fungsi biologis atau hubungan antar penyakit.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-sm border border-slate-200 transition hover:shadow-md hover:border-teal-500">
+                        <h3 class="font-bold text-lg mb-2">🌾 Pertanian</h3>
+                        <p class="text-slate-600">Mengelompokkan data varietas tanaman (misalnya padi) berdasarkan karakteristik pertumbuhan, ketahanan hama, dan hasil panen untuk rekomendasi penanaman.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-sm border border-slate-200 transition hover:shadow-md hover:border-teal-500">
+                        <h3 class="font-bold text-lg mb-2">💳 Analisis Keuangan</h3>
+                        <p class="text-slate-600">Menentukan kelayakan kredit calon peminjam dengan mengelompokkannya ke dalam profil risiko berdasarkan riwayat keuangan dan data lainnya.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-sm border border-slate-200 transition hover:shadow-md hover:border-teal-500">
+                        <h3 class="font-bold text-lg mb-2">🏙️ Perencanaan Kota</h3>
+                        <p class="text-slate-600">Menganalisis pola penggunaan lahan atau lalu lintas untuk mengoptimalkan pengembangan infrastruktur dan layanan publik.</p>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    // Navigation
+    const navButtons = document.querySelectorAll('.nav-button');
+    const contentSections = document.querySelectorAll('.content-section');
+
+    navButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            const target = button.dataset.target;
+
+            navButtons.forEach(btn => btn.classList.remove('active'));
+            button.classList.add('active');
+
+            contentSections.forEach(section => {
+                section.style.display = 'none';
+                if (section.id === target) {
+                    section.style.display = 'block';
+                }
+            });
+        });
+    });
+
+    // Simulation Logic
+    const ctx = document.getElementById('fcmChart').getContext('2d');
+    const clusterCountInput = document.getElementById('clusterCount');
+    const initBtn = document.getElementById('initBtn');
+    const centroidBtn = document.getElementById('centroidBtn');
+    const updateBtn = document.getElementById('updateBtn');
+    const iterateBtn = document.getElementById('iterateBtn');
+    const resetBtn = document.getElementById('resetBtn');
+    const explanationBox = document.getElementById('explanationBox');
+    let fcmChart;
+    
+    let dataPoints = [];
+    let centroids = [];
+    let membershipMatrix = [];
+    const w = 2; // Fuzziness parameter
+
+    const COLORS = ['#ef4444', '#3b82f6', '#10b981', '#f97316', '#8b5cf6', '#ec4899', '#facc15', '#06b6d4', '#65a30d', '#6d28d9'];
+    const CENTROID_SHAPES = ['rectRot', 'triangle', 'star', 'crossRot', 'rectRounded'];
+
+    function generateRandomData() {
+        dataPoints = [];
+        for (let i = 0; i < 100; i++) {
+            dataPoints.push({
+                x: Math.random() * 100,
+                y: Math.random() * 100
+            });
+        }
+    }
+
+    function initializeMembership(numClusters) {
+        membershipMatrix = [];
+        for (let i = 0; i < dataPoints.length; i++) {
+            let row = [];
+            let sum = 0;
+            for (let k = 0; k < numClusters; k++) {
+                let val = Math.random();
+                row.push(val);
+                sum += val;
+            }
+            // Normalize
+            membershipMatrix.push(row.map(val => val / sum));
+        }
+    }
+
+    function calculateCentroids(numClusters) {
+        centroids = [];
+        for (let k = 0; k < numClusters; k++) {
+            let numeratorX = 0;
+            let numeratorY = 0;
+            let denominator = 0;
+            for (let i = 0; i < dataPoints.length; i++) {
+                const membershipPower = Math.pow(membershipMatrix[i][k], w);
+                numeratorX += membershipPower * dataPoints[i].x;
+                numeratorY += membershipPower * dataPoints[i].y;
+                denominator += membershipPower;
+            }
+            centroids.push({
+                x: numeratorX / denominator,
+                y: numeratorY / denominator
+            });
+        }
+    }
+
+    function euclideanDistance(p1, p2) {
+        return Math.sqrt(Math.pow(p1.x - p2.x, 2) + Math.pow(p1.y - p2.y, 2));
+    }
+
+    function updateMembership(numClusters) {
+        membershipMatrix = [];
+        for (let i = 0; i < dataPoints.length; i++) {
+            let row = [];
+            for (let k = 0; k < numClusters; k++) {
+                let sum = 0;
+                const dist_ik = euclideanDistance(dataPoints[i], centroids[k]);
+                if (dist_ik === 0) {
+                     // Handle case where point is on a centroid
+                    let tempRow = Array(numClusters).fill(0);
+                    tempRow[k] = 1;
+                    row = tempRow;
+                    break;
+                }
+                
+                for (let j = 0; j < numClusters; j++) {
+                    const dist_jk = euclideanDistance(dataPoints[i], centroids[j]);
+                    if (dist_jk === 0) continue;
+                    sum += Math.pow(dist_ik / dist_jk, 2 / (w - 1));
+                }
+                if (row.length === numClusters) break;
+                row.push(1 / sum);
+            }
+            membershipMatrix.push(row);
+        }
+    }
+
+    function renderChart() {
+        const numClusters = parseInt(clusterCountInput.value);
+        const pointColors = dataPoints.map((_, i) => {
+            if (membershipMatrix.length === 0) return '#94a3b8'; // slate-400
+            const maxMembershipIndex = membershipMatrix[i].indexOf(Math.max(...membershipMatrix[i]));
+            return COLORS[maxMembershipIndex % COLORS.length];
+        });
+        
+        const datasets = [{
+            label: 'Data Points',
+            data: dataPoints,
+            backgroundColor: pointColors,
+            pointStyle: 'circle',
+            radius: 5
+        }];
+
+        if (centroids.length > 0) {
+            datasets.push({
+                label: 'Centroids',
+                data: centroids,
+                backgroundColor: COLORS.slice(0, numClusters).map(c => c),
+                borderColor: '#000',
+                borderWidth: 2,
+                pointStyle: (context) => CENTROID_SHAPES[context.dataIndex % CENTROID_SHAPES.length],
+                radius: 12,
+                rotation: 45
+            });
+        }
+
+        if (fcmChart) {
+            fcmChart.data.datasets = datasets;
+            fcmChart.update();
+        } else {
+            fcmChart = new Chart(ctx, {
+                type: 'scatter',
+                data: { datasets },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
+                        tooltip: {
+                             callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.parsed.x !== null) {
+                                        label += `(${context.parsed.x.toFixed(2)}, ${context.parsed.y.toFixed(2)})`;
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            min: 0,
+                            max: 100
+                        },
+                        y: {
+                            min: 0,
+                            max: 100
+                        }
+                    }
+                }
+            });
+        }
+    }
+
+    function setExplanation(title, text) {
+        explanationBox.innerHTML = `<h4 class="font-semibold text-slate-800">${title}</h4><p class="text-sm text-slate-600 mt-1">${text}</p>`;
+    }
+
+    function resetSimulation() {
+        dataPoints = [];
+        centroids = [];
+        membershipMatrix = [];
+        if (fcmChart) {
+            fcmChart.destroy();
+            fcmChart = null;
+        }
+        initBtn.disabled = false;
+        centroidBtn.disabled = true;
+        updateBtn.disabled = true;
+        iterateBtn.disabled = true;
+        setExplanation('Simulasi Direset', 'Klik "Inisialisasi" untuk memulai kembali.');
+    }
+
+    resetBtn.addEventListener('click', resetSimulation);
+
+    initBtn.addEventListener('click', () => {
+        const numClusters = parseInt(clusterCountInput.value);
+        generateRandomData();
+        initializeMembership(numClusters);
+        renderChart();
+        setExplanation('1. Inisialisasi Selesai', `100 data point acak dibuat. Matriks keanggotaan fuzzy awal juga telah dibuat untuk ${numClusters} cluster. Selanjutnya, hitung pusat cluster awal.`);
+        initBtn.disabled = true;
+        centroidBtn.disabled = false;
+        updateBtn.disabled = true;
+        iterateBtn.disabled = true;
+    });
+
+    centroidBtn.addEventListener('click', () => {
+        const numClusters = parseInt(clusterCountInput.value);
+        calculateCentroids(numClusters);
+        renderChart();
+        setExplanation('2. Perhitungan Pusat Cluster', `Pusat cluster (centroids) untuk ${numClusters} cluster telah dihitung berdasarkan matriks keanggotaan saat ini. Selanjutnya, perbarui derajat keanggotaan setiap data.`);
+        centroidBtn.disabled = true;
+        updateBtn.disabled = false;
+        iterateBtn.disabled = true;
+    });
+
+    updateBtn.addEventListener('click', () => {
+        const numClusters = parseInt(clusterCountInput.value);
+        updateMembership(numClusters);
+        renderChart();
+        setExplanation('3. Update Matriks Keanggotaan', 'Derajat keanggotaan setiap data telah diperbarui berdasarkan jaraknya ke pusat cluster baru. Warna titik data kini mencerminkan cluster dengan keanggotaan tertinggi. Iterasi pertama selesai. Anda bisa melanjutkan iterasi berikutnya.');
+        updateBtn.disabled = true;
+        centroidBtn.disabled = false;
+        iterateBtn.disabled = false;
+    });
+
+    iterateBtn.addEventListener('click', () => {
+        const numClusters = parseInt(clusterCountInput.value);
+        calculateCentroids(numClusters);
+        updateMembership(numClusters);
+        renderChart();
+        setExplanation('Iterasi Selesai', 'Pusat cluster dan matriks keanggotaan telah diperbarui. Perhatikan bagaimana pusat cluster bergerak dan warna titik data mungkin berubah. Lanjutkan iterasi hingga konvergen.');
+    });
+
+    clusterCountInput.addEventListener('change', resetSimulation);
+});
+</script>
+
+</body>
+</html>
